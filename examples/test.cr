@@ -33,5 +33,5 @@ end
 ctx=Crjsc.new
 g=ctx.global
 g["File"]=JSFile.new(ctx)
-fc=ctx.eval("var f,fc; f=new File(\"./examples/test.txt\",\"wrb\"); fc=f.read(10); f.write(\"klmnopqrst\"); return fc;")
+fc=ctx.eval("var f,fc; f=new File(\"./examples/test.txt\",\"rb\"); fc=f.read(10); return fc;")
 puts "contents:#{fc}"
