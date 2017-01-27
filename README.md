@@ -7,6 +7,8 @@ You can call javascript functions and read values from Crystal, and you can writ
 The goal of this library is to allow the most seemless back-and-forth between Javascript and Crystal that is possible.
 Pull requests, issues, comments and suggestions are gladly welcome.
 
+This library is not suitable in production, and should be considered alpha level software.
+
 ## Todo
 
 * Add propper docs to classes
