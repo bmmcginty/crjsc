@@ -1,0 +1,12 @@
+/jscore/
+/doc/
+/lib/
+/bin/
+/.shards/
+/src/ext/*.so*
+/src/ext/webkit/
+/jscore
+
+# Libraries don't need dependency lock
+# Dependencies will be locked in application that uses them
+/shard.lock
