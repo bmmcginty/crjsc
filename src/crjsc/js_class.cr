@@ -90,9 +90,9 @@ end
       @@jctx.as(Context)
     end
 
-def to_jsobject()
-@j.not_nil!
-end
+    def to_jsobject
+      @j.not_nil!
+    end
 
     def to_js(jsc)
       @j.not_nil!.as(LibJavaScriptCore::Valueref)
