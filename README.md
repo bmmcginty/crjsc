@@ -11,6 +11,7 @@ This library is not suitable in production, and should be considered alpha level
 
 ## Todo
 
+* Support calling js functions atached to js objects from crystal.
 * Add propper docs to classes
 * Explain jsprop
 * Allow wildcard getProperty  and setProperty calls
@@ -31,14 +32,27 @@ dependencies:
 
 ## Usage
 
-To build, run `make` in the root of this repository.
+All of the following should be performed from the root of this repository.
 
-See examples/test.cr.
+* To build, run `make`.
+* To test, run `make spec`.
+* To run the example(s), run `make examples`.
+
+See examples/file_interface.cr for an example that exposes file access to Javascript.
 
 ## Development
 
-You'll need the JavaScriptCore libraries.
+The JavaScriptCore library will be downloaded to `src/ext/webkit`.
+It will also be symlinked to `jscore` for quicker access.
+Use `jscore/API` to look at the C interface to JavaScriptCore.
+Make changes in `src/crjsc/lib.cr` or the appropriate file.
 
+### Low-level Notes
+* All JSObjects are (interchangeable) JSValues.
+* Not all JSValues are JSObjects. Use `value_is_object` to check this.
+* To convert a crystal type to Javascript, insure that a `to_js(ctx)` method exists, that it accepts a Crjsc::Context, and that it outputs a Crjsc::LibJavaScriptCore::Valueref (or in some cases a Crjsc::LibJavaScriptCore::Objectref).
+* To convert a Javascript type to a native Crystal type, insure that a to_cr method exists and returns a crystal type.
+* If you are accessing a complex JS object from Crystal, use the obj[name] and obj[name]=value method to access and mutate properties/functions of that object.
 
 ## Contributing
 
