@@ -1,41 +1,42 @@
+alias CT = Crjsc::ValueRef::CrystalTypes | Int32 | Array(CT)
+
+def convert(ctx, g, cro)
+  it "should convert #{cro.inspect} to same" do
+    g["test"] = cro
+    jro = ctx.eval("return test;")
+    t = g["test"]
+    ret = (t == cro == jro)
+    unless ret
+      puts "#{cro.inspect},#{jro.inspect}"
+    end
+    ret.should eq true
+  end
+end
+
+def get_types(ctx)
+  lst = [true, false, 1, 1.2, nil, "test", ctx.undefined]
+  lst2 = Array(CT).new
+  lst.each do |i|
+    lst2 << i
+    lst2 << [i]
+  end
+  lst2
+end
+
 module Crjsc
-  alias CT = ValueRef::CrystalTypes | Int32 | Array(CT)
-
+  num_of_contexts = 10
+  runs_per_context = 10
   describe "converts between Crystal and JSValue" do
-    lst = [true, false, 1, 1.2, nil, "test"]
-    lst2 = Array(CT).new
-    lst.each do |i|
-      lst2 << i
-      lst2 << [i]
-    end
-
-    lst2.each do |cro|
-      it "should convert #{cro.inspect} to same" do
-        ctx = Context.new
-        g = ctx.global
-        g["test"] = cro
-        jro = ctx.eval("return test;")
-        ret = (cro == jro)
-        unless ret
-          puts "#{cro.inspect},#{jro.inspect}"
-        end
-        ret.should eq true
-      end
-    end
-
-    it "should convert undefined from crystal to js and back" do
+    num_of_contexts.times do |context_num|
       ctx = Context.new
       g = ctx.global
-      cro = ctx.undefined
-      g["test"] = cro
-      jro = ctx.eval("return test;")
-      (cro == jro).should eq true
-      cro = [ctx.undefined]
-      g["test"] = cro
-      jro = ctx.eval("return test;")
-      (cro == jro).should eq true
-    end # undefined
-
-  end # conversion
+      types = get_types(ctx)
+      runs_per_context.times do |run_num|
+        types.each do |type|
+          convert(ctx, g, type)
+        end # type
+      end   # run
+    end     # context
+  end       # describe
 
 end # module
