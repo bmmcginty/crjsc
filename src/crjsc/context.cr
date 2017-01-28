@@ -20,10 +20,19 @@ module Crjsc
 
     def initialize(obj : Nil = nil)
       @ctx = LibJavaScriptCore.global_context_create(obj)
+      protect
       @undefined = JSUndefined.new(self)
     end
 
     def finalize
+      unprotect
+    end
+
+    def protect
+      LibJavaScriptCore.global_context_retain @ctx
+    end
+
+    def unprotect
       LibJavaScriptCore.global_context_release @ctx
     end
 

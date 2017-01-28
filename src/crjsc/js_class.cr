@@ -42,7 +42,7 @@ f=::Crjsc::LibJavaScriptCore::Staticfunction.new
 f.name={{call.name.stringify}}
 f.call_as_function=::Crjsc::LibJavaScriptCore::Objectcallasfunctioncallback.new do |ctx,func,this,count,args,error|
 v={{@type.id}}.get_this(this)
-crargs=Crjsc::JSClass.js_args_to_cr(v.jctx,args,count)
+crargs={{@type.id}}.js_args_to_cr(v.jctx,args,count)
 begin
 ret=v.{{call.name}}(crargs)
 ret.to_js(v.jctx)
@@ -112,43 +112,45 @@ end
 
     macro setup
 unless @@has_setup
-classdef=LibJavaScriptCore::Classdefinition.new
+classdef=::Crjsc::LibJavaScriptCore::Classdefinition.new
 classdef.class_name=self.class.name
 classdef.static_functions=@@jsmethods
 classdef.static_values=@@jsprops
 {% if @type.methods.map { |i| i.name.id.stringify }.includes?("jsinitialize") %}
-classdef.initialize=LibJavaScriptCore::Objectinitializecallback.new do |ctx,this|
+classdef.initialize=::Crjsc::LibJavaScriptCore::Objectinitializecallback.new do |ctx,this|
 v={{@type.id}}.get_this(this)
 v.jsinitialize()
 end
 {% end %}
 {% if @type.methods.map { |i| i.name.id.stringify }.includes?("jsfinalize") %}
-classdef.finalize=LibJavaScriptCore::Objectinitializecallback.new do |this|
+classdef.finalize=::Crjsc::LibJavaScriptCore::Objectinitializecallback.new do |this|
 v={{@type.id}}.get_this(this)
 v.jsfinalize()
 end
 {% end %}
 {% if @type.methods.map { |i| i.name.id.stringify }.includes?("jsnew") %}
-classdef.call_as_constructor=LibJavaScriptCore::Objectcallasconstructorcallback.new do |ctx,this,count,args,error|
+classdef.call_as_constructor=::Crjsc::LibJavaScriptCore::Objectcallasconstructorcallback.new do |ctx,this,count,args,error|
 v={{@type.id}}.get_this(this)
-crargs=JSClass.js_args_to_cr(v.jctx,args,count)
+crargs={{@type.id}}.js_args_to_cr(v.jctx,args,count)
 v.jsnew(crargs).to_jsobject
 end
 {% end %}
 {% if @type.methods.map { |i| i.name.id.stringify }.includes?("jscall") %}
-classdef.call_as_function=LibJavaScriptCore::Objectcallasfunctioncallback.new do |ctx,func,this,count,args,error|
+classdef.call_as_function=::Crjsc::LibJavaScriptCore::Objectcallasfunctioncallback.new do |ctx,func,this,count,args,error|
 v={{@type.id}}.get_this(func)
-crargs=JSClass.js_args_to_cr(v.jctx,args,count)
+crargs={{@type.id}}.js_args_to_cr(v.jctx,args,count)
 v.jscall(crargs).to_js(v.jctx)
 end
 {% end %}
-classref=LibJavaScriptCore.class_create(pointerof(classdef))
+classref=::Crjsc::LibJavaScriptCore.class_create(pointerof(classdef))
 @@classdef=classdef
 @@classref=classref
+@@has_setup=true
 end
 bx=Box({{@type.id}}).box(self)
-JSClass.boxes[bx]=self.as(::Crjsc::JSClass)
-j=LibJavaScriptCore.object_make(jctx,classref.not_nil!,bx)
+#store all boxed items in JSClass for easy retrieval
+::Crjsc::JSClass.boxes[bx]=self.as(::Crjsc::JSClass)
+j=::Crjsc::LibJavaScriptCore.object_make(jctx.not_nil!,@@classref.not_nil!,bx)
 @j=j
 @j
 end
